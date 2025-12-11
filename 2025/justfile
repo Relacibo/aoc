@@ -1,0 +1,26 @@
+set working-directory := '.'
+# Global Variables
+CC := "gcc"
+CFLAGS := "-Wall -Wextra -std=c23 -O2"
+OUTPUT_DIR := "bin"
+
+build module_name:
+    #!/bin/sh
+    MODULE_NAME="{{module_name}}"
+    SOURCE_FILE="src/$MODULE_NAME/main.c"
+    APP_NAME="$MODULE_NAME"
+    # Safety Check (Pure Shell Logic)
+    if [ ! -f "$SOURCE_FILE" ]; then
+        echo "Error: Source file $SOURCE_FILE does not exist."
+        exit 1
+    fi
+    mkdir -p {{OUTPUT_DIR}}
+    # Compilation
+    {{CC}} "$SOURCE_FILE" {{CFLAGS}} -DPROJECT_ROOT_DIR=\"$(pwd)\" -o {{OUTPUT_DIR}}/"$APP_NAME"
+
+run module_name: (build module_name)
+    @./{{OUTPUT_DIR}}/{{module_name}}
+
+clean:
+    @echo "Cleaning up binary directory..."
+    @rm -rf {{OUTPUT_DIR}}
