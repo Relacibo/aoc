@@ -46,13 +46,6 @@ void input_free(Input *input){
     free(input);
 }
 
-UT_array* input_into_fresh_ids(Input *input) {
-    utarray_free(input->ids);
-    UT_array *res = input->fresh_ids;
-    free(input);
-    return res;
-}
-
 Input* read_input_file() {
     char input_file_path[MAX_PATH_LENGTH];
 
@@ -161,6 +154,7 @@ unsigned long solution2(Input *input) {
                     .to = range.to,
                 };
                 if (DEBUG_PRINT_SOLUTION_2) {
+                    printf("Merging %ld-%ld into %ld-%ld ", range.from, range.to, other->from, other->to);
                     printf("(Replacing)\n");
                 }
                 has_merged = 1;
@@ -187,7 +181,6 @@ int main() {
     unsigned long res1 = solution1(content);
     printf("Solution 1: %lu\n", res1);
     
-    content = read_input_file();
     unsigned long res2 = solution2(content);
     printf("Solution 2: %lu\n", res2);
 
