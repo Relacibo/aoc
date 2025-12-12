@@ -1,7 +1,7 @@
 set working-directory := '.'
 # Global Variables
 CC := "gcc"
-CFLAGS := "-Wall -Wextra -std=c23 -O2"
+CFLAGS := "-Wall -Wextra -Werror -std=c23 -O2"
 OUTPUT_DIR := "bin"
 
 build module_name:
