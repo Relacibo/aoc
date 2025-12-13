@@ -1,0 +1,12 @@
+[package]
+name = "aoc2025"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "aoc06"
+path = "src/06/main.rs"
+
+[dependencies]
+const_format = "0.2.35"
+itertools = "0.14.0"

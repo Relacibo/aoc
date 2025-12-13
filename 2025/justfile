@@ -24,3 +24,45 @@ run module_name: (build module_name)
 clean:
     @echo "Cleaning up binary directory..."
     @rm -rf {{OUTPUT_DIR}}
+
+download day:
+    #!/bin/bash
+    set -euo pipefail
+    
+    # Check if session-cookie file exists
+    if [ ! -f "./session-cookie" ]; then
+        echo "Error: session-cookie file not found!"
+        echo "Please create a session-cookie file with your AoC session token."
+        echo "Get it from: https://adventofcode.com (login, check cookies, copy 'session' value)"
+        exit 1
+    fi
+    
+    SESSION_COOKIE=$(cat ./session-cookie)
+    DAY=$(printf "%02d" "{{day}}")
+    FOLDER="./resources/$DAY"
+    
+    # Validate session cookie by checking if we can access AoC
+    echo "Validating session cookie..."
+    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -b "session=${SESSION_COOKIE}" https://adventofcode.com/2025/day/{{day}}/input)
+    
+    if [ "$HTTP_CODE" = "400" ] || [ "$HTTP_CODE" = "500" ]; then
+        echo "Error: Session cookie is invalid or expired! (HTTP $HTTP_CODE)"
+        echo "Please update your session-cookie file."
+        echo "Get a new session token from: https://adventofcode.com"
+        echo "  1. Login to Advent of Code"
+        echo "  2. Open browser developer tools (F12)"
+        echo "  3. Go to Application/Storage -> Cookies"
+        echo "  4. Copy the value of the 'session' cookie"
+        echo "  5. Save it to ./session-cookie"
+        exit 1
+    elif [ "$HTTP_CODE" = "404" ]; then
+        echo "Error: Day {{day}} not yet available! (HTTP 404)"
+        exit 1
+    elif [ "$HTTP_CODE" != "200" ]; then
+        echo "Warning: Unexpected HTTP status code: $HTTP_CODE"
+    fi
+    
+    echo "Session cookie is valid. Downloading day {{day}}..."
+    mkdir -p "$FOLDER"
+    curl -b "session=${SESSION_COOKIE}" "https://adventofcode.com/2025/day/{{day}}/input" -o "$FOLDER/input"
+    echo "Downloaded input to $FOLDER/input"
