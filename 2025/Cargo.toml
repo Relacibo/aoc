@@ -7,6 +7,10 @@ edition = "2024"
 name = "aoc06"
 path = "src/06/main.rs"
 
+[[bin]]
+name = "aoc07"
+path = "src/07/main.rs"
+
 [dependencies]
 const_format = "0.2.35"
 itertools = "0.14.0"
