@@ -115,8 +115,7 @@ fn solution2() -> i128 {
         if last_row > row_num {
             let nephews = results.pop().unwrap();
             nephews.values().sum();
-            results.resize(row_num + 1, HashMap::new());
-            results[row_num] += r;
+            results[row_num].entry(key);
             memo.insert(elem, r);
             if DEBUG_SOLUTION2 {
                 println!("^^^^^^");
