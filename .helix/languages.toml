@@ -2,5 +2,8 @@
 name = "rust"
 language-servers = ["rust-analyzer"]
 
+formatter = { command = "rustfmt", args = ["--edition", "2024"] }
+auto-format = true
+
 [language-server.rust-analyzer.config]
 check.command = "clippy"

@@ -1,9 +1,8 @@
 use std::{
-    collections::{HashMap, VecDeque},
+    collections::HashMap,
     fs::File,
     io::{BufRead, BufReader},
     path::Path,
-    str::FromStr,
 };
 
 use const_format::concatcp;
@@ -12,8 +11,8 @@ const DEBUG_SOLUTION1: bool = false;
 const DEBUG_SOLUTION2: bool = false;
 
 const DAY: &str = "07";
-// const INPUT_FILE_NAME: &str = "input";
-const INPUT_FILE_NAME: &str = "example";
+const INPUT_FILE_NAME: &str = "input";
+// const INPUT_FILE_NAME: &str = "example";
 const INPUT_FILE_PATH: &str = concatcp!(
     env!("CARGO_MANIFEST_DIR"),
     "/resources/",
@@ -69,24 +68,37 @@ struct Elem {
 
 fn solution2() -> i128 {
     let CharGrid { mut content } = parse_input();
-    let mut res: i128 = 0;
 
     let mut memo: HashMap<Elem, i128> = HashMap::new();
-    let mut results: Vec<HashMap<Elem, i128>> = Vec::new();
+    let mut results: Vec<(Elem, i128)> = Vec::new();
 
-    let mut queue: Vec<Elem> = Vec::new();
+    let mut stack: Vec<Elem> = Vec::new();
     let start = content[0].iter().position(|ch| *ch == 'S').unwrap();
-    queue.push(Elem {
+    stack.push(Elem {
         row_num: 0,
         col_num: start,
     });
 
-    let mut last_row = 0;
-    while let Some(elem) = queue.pop() {
+    while let Some(elem) = stack.pop() {
         let Elem { row_num, col_num } = elem;
-        let mut current_row_res = 0;
+
+        // Memo
+        while results.len() > row_num {
+            let sr_index = results.len() - 1;
+            let (elem, elem_res) = results.pop().unwrap();
+            memo.insert(elem, elem_res);
+            if sr_index > 0
+                && let Some((_, parent_res)) = &mut results.get_mut(sr_index - 1)
+            {
+                *parent_res += elem_res;
+            }
+        }
+
+        let mut current_res = 0;
         let Some(next_row) = content.get_mut(row_num + 1) else {
-            last_row = row_num;
+            if DEBUG_SOLUTION2 {
+                println!("Last row!");
+            }
             continue;
         };
         let indices = if next_row[col_num] == '^' {
@@ -98,48 +110,42 @@ fn solution2() -> i128 {
             .iter()
             .flatten()
             .filter(|x| next_row.get(**x).is_some());
+        let mut count = 0;
         for x in xs {
             let elem = Elem {
                 row_num: row_num + 1,
                 col_num: *x,
             };
             if let Some(x) = memo.get(&elem) {
-                res += x;
-                current_row_res += 1;
+                current_res += x;
             } else {
-                queue.push(elem);
+                stack.push(elem);
             }
+            count += 1;
         }
-
-        // Memo
-        if last_row > row_num {
-            let nephews = results.pop().unwrap();
-            nephews.values().sum();
-            results[row_num].entry(key);
-            memo.insert(elem, r);
-            if DEBUG_SOLUTION2 {
-                println!("^^^^^^");
-                dbg!(last_row);
-                dbg!(row_num);
-                dbg!(future_res);
-                dbg!(current_row_res);
-                dbg!(results[row_num]);
-            }
-        } else {
-            results.resize(row_num + 1, 0);
-            results[row_num] += current_row_res;
-            if DEBUG_SOLUTION2 {
-                println!(">>>>>>");
-                dbg!(last_row);
-                dbg!(row_num);
-                dbg!(current_row_res);
-                dbg!(results[row_num]);
-            }
+        if count == 2 {
+            current_res += 1;
         }
-        last_row = row_num;
+        assert_eq!(results.len(), row_num);
+        if DEBUG_SOLUTION2 {
+            dbg!(&elem);
+        }
+        results.push((elem, current_res));
+        // dbg!(&results);
     }
-    res
+    // Memo
+    while results.len() > 1 {
+        let sr_index = results.len() - 1;
+        let (_, elem_res) = results.pop().unwrap();
+        if sr_index > 0
+            && let Some((_, parent_res)) = &mut results.get_mut(sr_index - 1)
+        {
+            *parent_res += elem_res;
+        }
+    }
+    results[0].1 + 1
 }
+
 #[derive(Clone, Debug)]
 struct CharGrid {
     content: Vec<Vec<char>>,
