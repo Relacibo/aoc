@@ -3,6 +3,7 @@ set working-directory := '.'
 CC := "gcc"
 CFLAGS := "-Wall -Wextra -Werror -std=c23 -O2"
 OUTPUT_DIR := "bin"
+YEAR := "2025"
 
 build module_name:
     #!/bin/sh
@@ -25,7 +26,7 @@ clean:
     @echo "Cleaning up binary directory..."
     @rm -rf {{OUTPUT_DIR}}
 
-download day:
+dl day:
     #!/bin/bash
     set -euo pipefail
     
@@ -43,7 +44,7 @@ download day:
     
     # Validate session cookie by checking if we can access AoC
     echo "Validating session cookie..."
-    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -b "session=${SESSION_COOKIE}" https://adventofcode.com/2025/day/{{day}}/input)
+    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -b "session=${SESSION_COOKIE}" https://adventofcode.com/{{YEAR}}/day/{{day}}/input)
     
     if [ "$HTTP_CODE" = "400" ] || [ "$HTTP_CODE" = "500" ]; then
         echo "Error: Session cookie is invalid or expired! (HTTP $HTTP_CODE)"
@@ -64,5 +65,13 @@ download day:
     
     echo "Session cookie is valid. Downloading day {{day}}..."
     mkdir -p "$FOLDER"
-    curl -b "session=${SESSION_COOKIE}" "https://adventofcode.com/2025/day/{{day}}/input" -o "$FOLDER/input"
+    curl -b "session=${SESSION_COOKIE}" "https://adventofcode.com/{{YEAR}}/day/{{day}}/input" -o "$FOLDER/input"
     echo "Downloaded input to $FOLDER/input"
+
+desc day part="1":
+    #!/bin/bash
+    if [ "{{part}}" = "1" ]; then
+        firefox --new-tab "https://adventofcode.com/{{YEAR}}/day/{{day}}"
+    else
+        firefox --new-tab "https://adventofcode.com/{{YEAR}}/day/{{day}}#part2"
+    fi
