@@ -70,7 +70,7 @@ Grid *read_input_file() {
 }
 
 unsigned long solution1(Grid *grid) {
-  Direction *dirs = all_directions();
+  GridDirection *dirs = all_directions();
   UT_array **current_row_ptr = (UT_array **)utarray_front(grid->content);
   size_t y = 0;
   unsigned long sum = 0;
@@ -80,15 +80,15 @@ unsigned long solution1(Grid *grid) {
     int *char_val = (int *)utarray_front(current_row);
     while (char_val != NULL) {
       if (*char_val == '@') {
-        Coords coords;
-        coords = (Coords){
+        GridCoords coords;
+        coords = (GridCoords){
             .x = x,
             .y = y,
         };
         unsigned int rolls_count = 0;
         for (size_t i = 0; i < ALL_DIRECTIONS_LEN; i++) {
-          Direction direction = dirs[i];
-          Coords new_coords;
+          GridDirection direction = dirs[i];
+          GridCoords new_coords;
           char val;
           if (grid_move_direction(&new_coords, &val, grid, &coords, direction,
                                   1) == MOVE_SUCCESS) {
@@ -115,7 +115,7 @@ unsigned long solution1(Grid *grid) {
 }
 
 unsigned long solution2(Grid *grid) {
-  Direction *dirs = all_directions();
+  GridDirection *dirs = all_directions();
   unsigned long sum = 0;
   unsigned int step = 1;
   unsigned long removed_last_round = 1;
@@ -129,15 +129,15 @@ unsigned long solution2(Grid *grid) {
       int *char_val = (int *)utarray_front(current_row);
       while (char_val != NULL) {
         if (*char_val == '@') {
-          Coords coords;
-          coords = (Coords){
+          GridCoords coords;
+          coords = (GridCoords){
               .x = x,
               .y = y,
           };
           unsigned int rolls_count = 0;
           for (size_t i = 0; i < ALL_DIRECTIONS_LEN; i++) {
-            Direction direction = dirs[i];
-            Coords new_coords;
+            GridDirection direction = dirs[i];
+            GridCoords new_coords;
             char val;
             if (grid_move_direction(&new_coords, &val, grid, &coords, direction,
                                     1) == MOVE_SUCCESS) {
